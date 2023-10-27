@@ -6,7 +6,7 @@ import os, sys
 import time
 
 def read_txt():
-    with open(f"/Data_txt_list/MDD_RoI_signal_list.txt", 'r') as f:
+    with open(f"Data_txt_list/MDD_RoI_signal_list.txt", 'r') as f:
             f_names = f.read().splitlines()
     return f_names
 
@@ -70,7 +70,7 @@ def fisher_z_transformation(FC_data_fold="", atlas="AAL"):
 
     timestamp = FC_data_fold[:14]
     print("fisher_z, {}, {}".format(timestamp, atlas))
-    data_save_dir = 'Data/ROISignals_FunImgARCWF_FCmap_fisher_z/MDD_{}_FC_fisher_ztrans_data_inf'.format(atlas)
+    data_save_dir = 'Data/ROISignals_FunImgARCWF_FCmap_fisher_z/Data_{}_FC_fisher_ztrans_data_inf'.format(atlas)
     if not (os.path.isdir(data_save_dir)):
         os.mkdir(data_save_dir)
     path_dir = 'Data/ROISignals_FunImgARCWF_FCmap/{}'.format(FC_data_fold)
