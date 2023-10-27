@@ -9,7 +9,7 @@ from utils import selecting_optim
 from data import multi_atlas_DataLoader, multi_atlas_DataLoader_Three
 from model import Single_GNN
 from Config import Config
-from train_eval_test_Hol import train_two, test_two, train_three, test_three
+from train_Ours import train_two, test_two, train_three, test_three
 from seed import set_seed
 
 
