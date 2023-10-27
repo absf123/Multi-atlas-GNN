@@ -31,7 +31,6 @@ def get_subject_id(file_name):
     return symptom, subject_ID, mat_full_name  # MDD, S1-1-0001, ROISignals_S1-1-0001.mat
 
 
-# 2021.8.18
 def get_FC_map(txt=None, nan_fc_subject_list=None, atlas="Harvard", fold_num=1):
     data_load_path = f"Data/{atlas}/MDD_{atlas}_FC"
 
@@ -72,6 +71,7 @@ def get_FC_map(txt=None, nan_fc_subject_list=None, atlas="Harvard", fold_num=1):
 def single_atlas_DataLoader(args, single_atlas):
     txt_train_dir = f'Data_txt_list/MDD_train_data_list_fold_' + str(args.fold_num) + '.txt'
     txt_test_dir = f'Data_txt_list/MDD_test_data_list_fold_' + str(args.fold_num) + '.txt'
+    # zero roi subject
     nan_fc_subject_list = ['ROISignals_S20-1-0028.mat', 'ROISignals_S20-1-0038.mat', 'ROISignals_S20-1-0061.mat',
                            'ROISignals_S20-1-0094.mat', 'ROISignals_S20-1-0251.mat', 'ROISignals_S20-2-0038.mat',
                            'ROISignals_S20-2-0045.mat', 'ROISignals_S20-2-0063.mat', 'ROISignals_S20-2-0095.mat']
@@ -132,6 +132,7 @@ def multi_atlas_DataLoader(args, Multi_atlas, Holistic_atlas):
 
     txt_train = pd.read_csv(txt_train_dir, names=['Subject ID'])
     txt_test = pd.read_csv(txt_test_dir, names=['Subject ID'])
+    # zero roi subject
     nan_fc_subject_list = ['ROISignals_S20-1-0028.mat', 'ROISignals_S20-1-0038.mat', 'ROISignals_S20-1-0061.mat',
                            'ROISignals_S20-1-0094.mat', 'ROISignals_S20-1-0251.mat', 'ROISignals_S20-2-0038.mat',
                            'ROISignals_S20-2-0045.mat', 'ROISignals_S20-2-0063.mat', 'ROISignals_S20-2-0095.mat']
@@ -144,7 +145,7 @@ def multi_atlas_DataLoader(args, Multi_atlas, Holistic_atlas):
     [Hol_train_data, Hol_train_label, Hol_train_weight_index, Hol_topology] = get_FC_map(txt=txt_train, nan_fc_subject_list=nan_fc_subject_list, atlas=Holistic_atlas, fold_num=args.fold_num)
     [Hol_test_data, Hol_test_label, _, _] = get_FC_map(txt=txt_test, nan_fc_subject_list=nan_fc_subject_list, atlas=Holistic_atlas, fold_num=args.fold_num)
 
-
+    # To define edge 
     T1_train_static_edge,\
     T1_test_static_edge = define_node_edge(train_data=T1_train_data,
                                             test_data=T1_test_data, t=T1_topology, p_value=args.Multi_p_value[0], edge_binary=args.edge_binary,edge_abs=args.edge_abs)
@@ -207,7 +208,7 @@ class custom_multi_dataset(torch.utils.data.Dataset):
     Hol : AAL&Harvard
     """
     def __init__(self, T1_node_tensor, T1_edge_tensor,  T2_node_tensor, T2_edge_tensor,
-                 Hol_node_tensor, Hol_edge_tensor, label_tensor, train_mask=None, test_mask=None):
+                 Hol_node_tensor, Hol_edge_tensor, label_tensor):
         super(custom_multi_dataset, self).__init__()
         self.T1_x = T1_node_tensor
         self.T2_x = T2_node_tensor
@@ -216,29 +217,21 @@ class custom_multi_dataset(torch.utils.data.Dataset):
         self.T2_edge = T2_edge_tensor
         self.Hol_edge = Hol_edge_tensor
         self.y = label_tensor
-        self.train_mask = train_mask
-        self.test_mask = test_mask
-
+                     
     def __getitem__(self, index):
-        if self.train_mask is None:
-            return self.T1_x[index], self.T1_edge[index], self.T2_x[index], self.T2_edge[index],\
-                   self.Hol_x[index], self.Hol_edge[index], self.y[index]
-        else:
-            return self.T1_x[index], self.T1_edge[index], self.T2_x[index], self.T2_edge[index],\
-                   self.Hol_x[index], self.Hol_edge[index], self.y[index],\
-                   self.train_mask[index], self.test_mask[index]
-
+        return self.T1_x[index], self.T1_edge[index], self.T2_x[index], self.T2_edge[index],\
+               self.Hol_x[index], self.Hol_edge[index], self.y[index]
     def __len__(self):
         return len(self.T1_x)
 
 
-# 수정필요 2021.11.22 ~ 2023.01.17
 def multi_atlas_DataLoader_Three(args, Multi_atlas, Holistic_atlas):
     txt_train_dir = f'Data_txt_list/MDD_train_data_list_fold_' + str(args.fold_num) + '.txt'
     txt_test_dir = f'Data_txt_list/MDD_test_data_list_fold_' + str(args.fold_num) + '.txt'
 
     txt_train = pd.read_csv(txt_train_dir, names=['Subject ID'])
     txt_test = pd.read_csv(txt_test_dir, names=['Subject ID'])
+    # zero roi subject
     nan_fc_subject_list = ['ROISignals_S20-1-0028.mat', 'ROISignals_S20-1-0038.mat', 'ROISignals_S20-1-0061.mat',
                            'ROISignals_S20-1-0094.mat', 'ROISignals_S20-1-0251.mat', 'ROISignals_S20-2-0038.mat',
                            'ROISignals_S20-2-0045.mat', 'ROISignals_S20-2-0063.mat', 'ROISignals_S20-2-0095.mat']
@@ -254,7 +247,7 @@ def multi_atlas_DataLoader_Three(args, Multi_atlas, Holistic_atlas):
     [Hol_train_data, Hol_train_label, Hol_train_weight_index, Hol_topology] = get_FC_map(txt=txt_train, nan_fc_subject_list=nan_fc_subject_list, atlas=Holistic_atlas, fold_num=args.fold_num)
     [Hol_test_data, Hol_test_label, _, _] = get_FC_map(txt=txt_test, nan_fc_subject_list=nan_fc_subject_list, atlas=Holistic_atlas, fold_num=args.fold_num)
 
-
+    # To define edge
     T1_train_static_edge,\
     T1_test_static_edge = define_node_edge(train_data=T1_train_data,
                                             test_data=T1_test_data, t=T1_topology, p_value=args.Multi_p_value[0], edge_binary=args.edge_binary,edge_abs=args.edge_abs)
@@ -327,7 +320,7 @@ class custom_multi_dataset_Three(torch.utils.data.Dataset):
     Hol : AAL&Harvard
     """
     def __init__(self, T1_node_tensor, T1_edge_tensor,  T2_node_tensor, T2_edge_tensor, T3_node_tensor, T3_edge_tensor,
-                 Hol_node_tensor, Hol_edge_tensor, label_tensor, train_mask=None, test_mask=None):
+                 Hol_node_tensor, Hol_edge_tensor, label_tensor):
         super(custom_multi_dataset_Three, self).__init__()
         self.T1_x = T1_node_tensor
         self.T2_x = T2_node_tensor
@@ -338,17 +331,12 @@ class custom_multi_dataset_Three(torch.utils.data.Dataset):
         self.T3_edge = T3_edge_tensor
         self.Hol_edge = Hol_edge_tensor
         self.y = label_tensor
-        self.train_mask = train_mask
-        self.test_mask = test_mask
 
     def __getitem__(self, index):
-        if self.train_mask is None:
-            return self.T1_x[index], self.T1_edge[index], self.T2_x[index], self.T2_edge[index], self.T3_x[index], self.T3_edge[index],\
-                   self.Hol_x[index], self.Hol_edge[index], self.y[index]
-        else:
-            return self.T1_x[index], self.T1_edge[index], self.T2_x[index], self.T2_edge[index], self.T3_x[index], self.T3_edge[index],\
-                   self.Hol_x[index], self.Hol_edge[index], self.y[index],\
-                   self.train_mask[index], self.test_mask[index]
+        return self.T1_x[index], self.T1_edge[index], self.T2_x[index], self.T2_edge[index], self.T3_x[index], self.T3_edge[index],\
+               self.Hol_x[index], self.Hol_edge[index], self.y[index]
+    def __len__(self):
+        return len(self.T1_x)
 
     def __len__(self):
         return len(self.T1_x)
