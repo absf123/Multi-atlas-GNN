@@ -11,7 +11,6 @@ from graph_utils import define_node_edge
 from seed import set_seed
 
 
-
 def get_subject_id(file_name):
     mat_full_name = str(file_name)  # file_name : ROISignals_S1-1-0001.mat
     file_name_label = file_name.split('-')[1]
@@ -31,14 +30,14 @@ def get_subject_id(file_name):
     return symptom, subject_ID, mat_full_name  # MDD, S1-1-0001, ROISignals_S1-1-0001.mat
 
 
-def get_FC_map(txt=None, nan_fc_subject_list=None, atlas="Harvard", fold_num=1):
+def get_FC_map(txt=None, nan_fc_subject_list=None, atlas="AAL", fold_num=1):
     data_load_path = f"Data/{atlas}/MDD_{atlas}_FC"
 
     data = []
     label = []
     train_weight_index = [0, 0]
 
-    topology = f"Topology/{atlas}/ttest_pvalue/t_test_{atlas}_fold_{fold_num}.npy"
+    topology = f"Topology/{atlas}/t_test_{atlas}_fold_{fold_num}.npy"
 
     new_sub_list = []
     if len(nan_fc_subject_list) != 0:
@@ -47,8 +46,7 @@ def get_FC_map(txt=None, nan_fc_subject_list=None, atlas="Harvard", fold_num=1):
                 new_sub_list.append(sub_name)
     else:
         for sub_name in txt["Subject ID"]:
-            if sub_name in nan_fc_subject_list:
-                new_sub_list.append(sub_name)
+            new_sub_list.append(sub_name)
 
     for file_name in new_sub_list:
         symptom, subject_ID, mat_full_name = get_subject_id(file_name)  # MDD_Data, S1-1-0001, ROISignals_S1-1-0001.mat
@@ -69,8 +67,8 @@ def get_FC_map(txt=None, nan_fc_subject_list=None, atlas="Harvard", fold_num=1):
 
 
 def single_atlas_DataLoader(args, single_atlas):
-    txt_train_dir = f'Data_txt_list/MDD_train_data_list_fold_' + str(args.fold_num) + '.txt'
-    txt_test_dir = f'Data_txt_list/MDD_test_data_list_fold_' + str(args.fold_num) + '.txt'
+    txt_train_dir = f'Data_txt_list/MDD_train_data_list_' + str(args.fold_num) + '.txt'
+    txt_test_dir = f'Data_txt_list/MDD_test_data_list_' + str(args.fold_num) + '.txt'
     # zero roi subject
     nan_fc_subject_list = ['ROISignals_S20-1-0028.mat', 'ROISignals_S20-1-0038.mat', 'ROISignals_S20-1-0061.mat',
                            'ROISignals_S20-1-0094.mat', 'ROISignals_S20-1-0251.mat', 'ROISignals_S20-2-0038.mat',
@@ -127,8 +125,8 @@ class custom_single_dataset(torch.utils.data.Dataset):
 
 
 def multi_atlas_DataLoader(args, Multi_atlas, Holistic_atlas):
-    txt_train_dir = f'Data_txt_list/MDD_train_data_list_fold_' + str(args.fold_num) + '.txt'
-    txt_test_dir = f'Data_txt_list/MDD_test_data_list_fold_' + str(args.fold_num) + '.txt'
+    txt_train_dir = f'Data_txt_list/MDD_train_data_list_' + str(args.fold_num) + '.txt'
+    txt_test_dir = f'Data_txt_list/MDD_test_data_list_' + str(args.fold_num) + '.txt'
 
     txt_train = pd.read_csv(txt_train_dir, names=['Subject ID'])
     txt_test = pd.read_csv(txt_test_dir, names=['Subject ID'])
@@ -145,18 +143,16 @@ def multi_atlas_DataLoader(args, Multi_atlas, Holistic_atlas):
     [Hol_train_data, Hol_train_label, Hol_train_weight_index, Hol_topology] = get_FC_map(txt=txt_train, nan_fc_subject_list=nan_fc_subject_list, atlas=Holistic_atlas, fold_num=args.fold_num)
     [Hol_test_data, Hol_test_label, _, _] = get_FC_map(txt=txt_test, nan_fc_subject_list=nan_fc_subject_list, atlas=Holistic_atlas, fold_num=args.fold_num)
 
-    # To define edge 
-    T1_train_static_edge,\
+    # To define edge
+    T1_train_static_edge, \
     T1_test_static_edge = define_node_edge(train_data=T1_train_data,
-                                            test_data=T1_test_data, t=T1_topology, p_value=args.Multi_p_value[0], edge_binary=args.edge_binary,edge_abs=args.edge_abs)
-    T2_train_static_edge,\
+                                           test_data=T1_test_data, t=T1_topology, p_value=args.Multi_p_value[0], edge_binary=args.edge_binary, edge_abs=args.edge_abs)
+    T2_train_static_edge, \
     T2_test_static_edge = define_node_edge(train_data=T2_train_data,
-                                            test_data=T2_test_data, t=T2_topology, p_value=args.Multi_p_value[1], edge_binary=args.edge_binary,edge_abs=args.edge_abs)
-    Hol_train_static_edge,\
+                                           test_data=T2_test_data, t=T2_topology, p_value=args.Multi_p_value[1], edge_binary=args.edge_binary, edge_abs=args.edge_abs)
+    Hol_train_static_edge, \
     Hol_test_static_edge = define_node_edge(train_data=Hol_train_data,
-                                            test_data=Hol_test_data, t=Hol_topology, p_value=args.Multi_p_value[2], edge_binary=args.edge_binary,edge_abs=args.edge_abs)
-
-
+                                            test_data=Hol_test_data, t=Hol_topology, p_value=args.Multi_p_value[2], edge_binary=args.edge_binary, edge_abs=args.edge_abs)
 
     T1_train_Node_list = torch.FloatTensor(T1_train_data).to(args.device)
     T1_train_A_list = torch.FloatTensor(T1_train_static_edge).to(args.device)
@@ -207,7 +203,8 @@ class custom_multi_dataset(torch.utils.data.Dataset):
     T2 : Harvard
     Hol : AAL&Harvard
     """
-    def __init__(self, T1_node_tensor, T1_edge_tensor,  T2_node_tensor, T2_edge_tensor,
+
+    def __init__(self, T1_node_tensor, T1_edge_tensor, T2_node_tensor, T2_edge_tensor,
                  Hol_node_tensor, Hol_edge_tensor, label_tensor):
         super(custom_multi_dataset, self).__init__()
         self.T1_x = T1_node_tensor
@@ -217,17 +214,18 @@ class custom_multi_dataset(torch.utils.data.Dataset):
         self.T2_edge = T2_edge_tensor
         self.Hol_edge = Hol_edge_tensor
         self.y = label_tensor
-                     
+
     def __getitem__(self, index):
-        return self.T1_x[index], self.T1_edge[index], self.T2_x[index], self.T2_edge[index],\
+        return self.T1_x[index], self.T1_edge[index], self.T2_x[index], self.T2_edge[index], \
                self.Hol_x[index], self.Hol_edge[index], self.y[index]
+
     def __len__(self):
         return len(self.T1_x)
 
 
 def multi_atlas_DataLoader_Three(args, Multi_atlas, Holistic_atlas):
-    txt_train_dir = f'Data_txt_list/MDD_train_data_list_fold_' + str(args.fold_num) + '.txt'
-    txt_test_dir = f'Data_txt_list/MDD_test_data_list_fold_' + str(args.fold_num) + '.txt'
+    txt_train_dir = f'Data_txt_list/MDD_train_data_list_' + str(args.fold_num) + '.txt'
+    txt_test_dir = f'Data_txt_list/MDD_test_data_list_' + str(args.fold_num) + '.txt'
 
     txt_train = pd.read_csv(txt_train_dir, names=['Subject ID'])
     txt_test = pd.read_csv(txt_test_dir, names=['Subject ID'])
@@ -248,18 +246,18 @@ def multi_atlas_DataLoader_Three(args, Multi_atlas, Holistic_atlas):
     [Hol_test_data, Hol_test_label, _, _] = get_FC_map(txt=txt_test, nan_fc_subject_list=nan_fc_subject_list, atlas=Holistic_atlas, fold_num=args.fold_num)
 
     # To define edge
-    T1_train_static_edge,\
+    T1_train_static_edge, \
     T1_test_static_edge = define_node_edge(train_data=T1_train_data,
-                                            test_data=T1_test_data, t=T1_topology, p_value=args.Multi_p_value[0], edge_binary=args.edge_binary,edge_abs=args.edge_abs)
-    T2_train_static_edge,\
+                                           test_data=T1_test_data, t=T1_topology, p_value=args.Multi_p_value[0], edge_binary=args.edge_binary, edge_abs=args.edge_abs)
+    T2_train_static_edge, \
     T2_test_static_edge = define_node_edge(train_data=T2_train_data,
-                                            test_data=T2_test_data, t=T2_topology, p_value=args.Multi_p_value[1], edge_binary=args.edge_binary,edge_abs=args.edge_abs)
-    T3_train_static_edge,\
+                                           test_data=T2_test_data, t=T2_topology, p_value=args.Multi_p_value[1], edge_binary=args.edge_binary, edge_abs=args.edge_abs)
+    T3_train_static_edge, \
     T3_test_static_edge = define_node_edge(train_data=T3_train_data,
-                                            test_data=T3_test_data, t=T3_topology, p_value=args.Multi_p_value[2], edge_binary=args.edge_binary,edge_abs=args.edge_abs,)
-    Hol_train_static_edge,\
+                                           test_data=T3_test_data, t=T3_topology, p_value=args.Multi_p_value[2], edge_binary=args.edge_binary, edge_abs=args.edge_abs, )
+    Hol_train_static_edge, \
     Hol_test_static_edge = define_node_edge(train_data=Hol_train_data,
-                                            test_data=Hol_test_data, t=Hol_topology, p_value=args.Multi_p_value[3], edge_binary=args.edge_binary,edge_abs=args.edge_abs)
+                                            test_data=Hol_test_data, t=Hol_topology, p_value=args.Multi_p_value[3], edge_binary=args.edge_binary, edge_abs=args.edge_abs)
 
     T1_train_Node_list = torch.FloatTensor(T1_train_data).to(args.device)
     T1_train_A_list = torch.FloatTensor(T1_train_static_edge).to(args.device)
@@ -293,10 +291,11 @@ def multi_atlas_DataLoader_Three(args, Multi_atlas, Holistic_atlas):
     Hol_test_A_list = torch.FloatTensor(Hol_test_static_edge).to(args.device)
     Hol_test_label = torch.LongTensor(Hol_test_label).to(args.device)
 
-
     # dataloader
-    train_dataset = custom_multi_dataset_Three(T1_train_Node_list, T1_train_A_list, T2_train_Node_list, T2_train_A_list, T3_train_Node_list, T3_train_A_list, Hol_train_Node_list, Hol_train_A_list, T1_train_label)
-    test_dataset = custom_multi_dataset_Three(T1_test_Node_list, T1_test_A_list, T2_test_Node_list, T2_test_A_list, T3_test_Node_list, T3_test_A_list, Hol_test_Node_list, Hol_test_A_list, T1_test_label)
+    train_dataset = custom_multi_dataset_Three(T1_train_Node_list, T1_train_A_list, T2_train_Node_list, T2_train_A_list, T3_train_Node_list, T3_train_A_list, Hol_train_Node_list, Hol_train_A_list,
+                                               T1_train_label)
+    test_dataset = custom_multi_dataset_Three(T1_test_Node_list, T1_test_A_list, T2_test_Node_list, T2_test_A_list, T3_test_Node_list, T3_test_A_list, Hol_test_Node_list, Hol_test_A_list,
+                                              T1_test_label)
 
     set_seed(args.seed)
     if args.batch_size > len(train_dataset):  # full batch
@@ -319,7 +318,8 @@ class custom_multi_dataset_Three(torch.utils.data.Dataset):
     T2 : Harvard
     Hol : AAL&Harvard
     """
-    def __init__(self, T1_node_tensor, T1_edge_tensor,  T2_node_tensor, T2_edge_tensor, T3_node_tensor, T3_edge_tensor,
+
+    def __init__(self, T1_node_tensor, T1_edge_tensor, T2_node_tensor, T2_edge_tensor, T3_node_tensor, T3_edge_tensor,
                  Hol_node_tensor, Hol_edge_tensor, label_tensor):
         super(custom_multi_dataset_Three, self).__init__()
         self.T1_x = T1_node_tensor
@@ -333,9 +333,9 @@ class custom_multi_dataset_Three(torch.utils.data.Dataset):
         self.y = label_tensor
 
     def __getitem__(self, index):
-        return self.T1_x[index], self.T1_edge[index], self.T2_x[index], self.T2_edge[index], self.T3_x[index], self.T3_edge[index],\
+        return self.T1_x[index], self.T1_edge[index], self.T2_x[index], self.T2_edge[index], self.T3_x[index], self.T3_edge[index], \
                self.Hol_x[index], self.Hol_edge[index], self.y[index]
+
     def __len__(self):
         return len(self.T1_x)
-
 
