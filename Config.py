@@ -7,7 +7,7 @@ import re
 class Config():
     def __init__(self):
         super().__init__()
-        parser = argparse.ArgumentParser(description='Argparse single GCN')
+        parser = argparse.ArgumentParser(description='Argparse Multi-atlas project')
         timestamp = datetime.today().strftime("%Y%m%d%H%M%S")
 
         # pytorch base
@@ -21,7 +21,6 @@ class Config():
         parser.add_argument('--num_epoch', default=200, type=int, help='num_epoch')
         parser.add_argument('--test_epoch_checkpoint', default=10, type=int, help='step of test function')
         parser.add_argument('--weight_decay', default=1e-2, type=float, help='weight decay')
-        parser.add_argument('--activation', default="mish", type=str, help='activation : nn.RReLU, nn.ReLU, Mish')
         parser.add_argument('--optim', default="Adam", type=str, help='optimizer')
         parser.add_argument('--betas', default=(0.5, 0.9), type=tuple, help='adam betas')
         parser.add_argument("--momentum", default=0.9, type=float, help="optimizer momentum - SGD, MADGRAD")
@@ -33,7 +32,7 @@ class Config():
         parser.add_argument("--Multi_p_value", default=[0.01, 0.01, 0.01], type=list, help="AAL Harvard AALHarvard")
         parser.add_argument("--cheb_k", default=2, type=int, help="ChebGCN k for combine GCN")
         parser.add_argument("--Holistic_atlas", default="AH",
-                            type=str, help="atlas AH 228 AC 316 AP 380 HC 312 HP 376 CP 464 ")
+                            type=str, help="atlas AH 228 AC 316 HC 312")
         parser.add_argument("--Multi_atlas", default=["AAL", "Harvard"], type=list, help="T1, T2, T3")
         parser.add_argument("--Single_atlas", default="AAL", type=str, help="T1, T2, T3")
         parser.add_argument("--num_atlas", default=2, type=int, help="2, 3")
@@ -74,7 +73,6 @@ class Config():
         self.num_epoch = self.args.num_epoch
         self.test_epoch_checkpoint = self.args.test_epoch_checkpoint
         self.weight_decay = self.args.weight_decay
-        self.activation = self.args.activation
         self.optim = self.args.optim
         self.betas = self.args.betas
         self.momentum = self.args.momentum
