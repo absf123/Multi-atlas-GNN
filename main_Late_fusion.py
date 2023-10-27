@@ -7,7 +7,7 @@ import time
 import numpy as np
 from utils import selecting_optim
 from data import multi_atlas_DataLoader, multi_atlas_DataLoader_Three
-from model import Single_GNN
+from model import GNN
 from Config import Config
 from train_Late_fusion import train_two, test_two, train_three, test_three
 from seed import set_seed
@@ -23,10 +23,10 @@ def main(args, i):
     elif args.num_atlas==3:
         train_dataset, test_dataset, train_loader, test_loader, weight = multi_atlas_DataLoader_Three(args, Multi_atlas=args.Multi_atlas, Holistic_atlas=args.Holistic)
     # ChebNet
-    T1_model = Single_GNN(args=args, numROI=args.Multi_numROI[0], init_ch=args.Multi_numROI[0], channel=args.T1_embCh, K=args.cheb_k).to(args.device)
-    T2_model = Single_GNN(args=args, numROI=args.Multi_numROI[1], init_ch=args.Multi_numROI[1], channel=args.T2_embCh, K=args.cheb_k).to(args.device)
+    T1_model = GNN(args=args, numROI=args.Multi_numROI[0], init_ch=args.Multi_numROI[0], channel=args.T1_embCh, K=args.cheb_k).to(args.device)
+    T2_model = GNN(args=args, numROI=args.Multi_numROI[1], init_ch=args.Multi_numROI[1], channel=args.T2_embCh, K=args.cheb_k).to(args.device)
     if args.num_atlas==3:
-        T3_model = Single_GNN(args=args, numROI=args.Multi_numROI[2], init_ch=args.Multi_numROI[2], channel=args.T3_embCh, K=args.cheb_k).to(args.device)
+        T3_model = GNN(args=args, numROI=args.Multi_numROI[2], init_ch=args.Multi_numROI[2], channel=args.T3_embCh, K=args.cheb_k).to(args.device)
 
     # optimizer
     optimizer_T1_model = selecting_optim(args=args, model=T1_model, lr=args.lr)
