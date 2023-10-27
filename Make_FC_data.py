@@ -6,22 +6,24 @@ import os, sys
 import time
 
 def read_txt():
+    # MDD subject list
     with open(f"Data_txt_list/MDD_RoI_signal_list.txt", 'r') as f:
             f_names = f.read().splitlines()
     return f_names
 
 def make_fc_map(f_names, atlas="AAL"):
-
-    data_save_dir = 'Data/ROISignals_FunImgARCWF_static_FCmap/MDD_{}_FC_data'.format(atlas)
+    # FC matrix
+    data_save_dir = 'Data/ROISignals_FunImgARCWF_FCmap/Data_{}_FC_data'.format(atlas)
 
     if not (os.path.isdir(data_save_dir)):
-        os.mkdir(data_save_dir)
+        os.makedirs(data_save_dir)
 
     print("atlas: ", atlas)
     for f_name in f_names:
+        # original data
         mat_file = io.loadmat('Data/ROISignals_FunImgARCWF/{}'.format(f_name))
         mat = mat_file['ROISignals']  # signal, node
-        # Single
+        # single
         if atlas == "AAL":
             mat = mat[:, :116]   # AAL 116 ROI
         elif atlas == "Harvard":
@@ -29,7 +31,7 @@ def make_fc_map(f_names, atlas="AAL"):
         elif atlas == "Craddock":
             mat = mat[:, 228:428]   # 200 ROI
 
-        # Holistic atlas: Early fusion
+        # Holistic atlas: early fusion
         elif atlas == "AH":  # AAL, Harvard 228
             mat = mat[:, :228]
         elif atlas == "AC":  # AAL, Craddock 316
@@ -53,26 +55,21 @@ def make_fc_map(f_names, atlas="AAL"):
 
         corr_matrix = np.array(corr_df, dtype=[('ROI_Functional_connectivity', 'float64')])
 
-        # numpy파일 mat변환
         corr_matrix_dict = {}
-
-        # list로 변환하고 mat 저장
         for varname in corr_matrix.dtype.names:
             corr_matrix_dict[varname] = corr_matrix[varname]
 
         # functional connectivity matrix
-        io.savemat('Data/ROISignals_FunImgARCWF_static_FCmap/MDD_{}_FC_data/{}'.format(atlas, f_name), corr_matrix_dict)
+        io.savemat('Data/ROISignals_FunImgARCWF_FCmap/Data_{}_FC_data/{}'.format(atlas, f_name), corr_matrix_dict)
 
     return f"Data_{atlas}_FC_data"
 
 
 def fisher_z_transformation(FC_data_fold="", atlas="AAL"):
 
-    timestamp = FC_data_fold[:14]
-    print("fisher_z, {}, {}".format(timestamp, atlas))
-    data_save_dir = 'Data/ROISignals_FunImgARCWF_FCmap_fisher_z/Data_{}_FC_fisher_ztrans_data_inf'.format(atlas)
+    data_save_dir = f'Data/{atlas}/MDD_{atlas}_FC'
     if not (os.path.isdir(data_save_dir)):
-        os.mkdir(data_save_dir)
+        os.makedirs(data_save_dir)
     path_dir = 'Data/ROISignals_FunImgARCWF_FCmap/{}'.format(FC_data_fold)
 
     f_names = os.listdir(path_dir)
@@ -105,7 +102,7 @@ if __name__ == "__main__":
 
     atlas = 'AAL'
     start_time = time.time()
-    FC_data_fold = make_fc_map(f_names, atlas=atlas)
+    FC_data_fold = make_fc_map(f_names, atlas=atlas)  # "Data_{atlas}_FC_data"
     print(FC_data_fold)
 
     fisher_z_transformation(FC_data_fold=FC_data_fold, atlas=atlas)
