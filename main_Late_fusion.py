@@ -19,9 +19,9 @@ def main(args, i):
     set_seed(args.seed)
 
     if args.num_atlas==2:
-        train_dataset, test_dataset, train_loader, test_loader, weight = multi_atlas_DataLoader(args, Multi_atlas=args.Multi_atlas, Holistic_atlas=args.Holistic)
+        train_dataset, test_dataset, train_loader, test_loader, weight = multi_atlas_DataLoader(args, Multi_atlas=args.Multi_atlas, Holistic_atlas=args.Holistic_atlas)
     elif args.num_atlas==3:
-        train_dataset, test_dataset, train_loader, test_loader, weight = multi_atlas_DataLoader_Three(args, Multi_atlas=args.Multi_atlas, Holistic_atlas=args.Holistic)
+        train_dataset, test_dataset, train_loader, test_loader, weight = multi_atlas_DataLoader_Three(args, Multi_atlas=args.Multi_atlas, Holistic_atlas=args.Holistic_atlas)
     # ChebNet
     T1_model = GNN(args=args, numROI=args.Multi_numROI[0], init_ch=args.Multi_numROI[0], channel=args.T1_embCh, K=args.cheb_k).to(args.device)
     T2_model = GNN(args=args, numROI=args.Multi_numROI[1], init_ch=args.Multi_numROI[1], channel=args.T2_embCh, K=args.cheb_k).to(args.device)
