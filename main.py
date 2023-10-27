@@ -7,8 +7,8 @@ import time
 import numpy as np
 import utils
 from utils import selecting_optim
-from data import single_atlas_DataLoader
-from model import Single_GNN
+from data import atlas_DataLoader
+from model import GNN
 from Config import Config
 from train import train, test
 from seed import set_seed
@@ -21,11 +21,11 @@ def main(args, i):
     print("fold :{} device {}".format(args.fold_num, args.device))
     set_seed(args.seed)
 
-    train_loader, test_loader, weight = single_atlas_DataLoader(args=args, single_atlas=args.Single_atlas)
+    train_loader, test_loader, weight = atlas_DataLoader(args=args, atlas=args.Single_atlas)
 
     set_seed(args.seed)
     ## ChebNet
-    model = Single_GNN(args=args, numROI=args.numROI, init_ch=args.numROI, channel=args.embCh, K=args.cheb_k).to(args.device)
+    model = GNN(args=args, numROI=args.numROI, init_ch=args.numROI, channel=args.embCh, K=args.cheb_k).to(args.device)
 
     # optimizer
     optimizer_model = selecting_optim(args=args, model=model, lr=args.lr)
@@ -107,7 +107,6 @@ def cross(args):
                                                 np.mean(total_result[2]) * 100, np.mean(total_result[3]) * 100))
     print('std,{:.2f},{:.2f},{:.2f},{:.2f}'.format(np.nanstd(total_result[0], ddof=1) * 100, np.nanstd(total_result[1], ddof=1) * 100,
                                                   np.nanstd(total_result[2], ddof=1) * 100,np.nanstd(total_result[3], ddof=1) * 100))
-
 
 
 if __name__ == '__main__':
