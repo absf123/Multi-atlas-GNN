@@ -55,16 +55,16 @@ def main(args, i):
     path_save_info = f'results/Multi_atlas/{args.Multi_atlas[0]}_{args.Multi_atlas[1]}/model{args.timestamp}' + os.path.sep + f"train_info{args.timestamp}_{args.fold_num}.csv"
 
     # single results
-    T1_SH_path_save_info = f'results/Multi_atlas/{args.Multi_atlas[0]}_{args.Multi_atlas[1]}/model{args.timestamp}' + os.path.sep + "train_T1_sh_info{}_{}.csv".format(args.timestamp,
+    T1_path_save_info = f'results/Multi_atlas/{args.Multi_atlas[0]}_{args.Multi_atlas[1]}/model{args.timestamp}' + os.path.sep + "train_T1_info{}_{}.csv".format(args.timestamp,
                                                                                                 args.fold_num)
-    T2_SH_path_save_info = f'results/Multi_atlas/{args.Multi_atlas[0]}_{args.Multi_atlas[1]}/model{args.timestamp}' + os.path.sep + "train_T2_sh_info{}_{}.csv".format(args.timestamp,
+    T2_path_save_info = f'results/Multi_atlas/{args.Multi_atlas[0]}_{args.Multi_atlas[1]}/model{args.timestamp}' + os.path.sep + "train_T2_info{}_{}.csv".format(args.timestamp,
                                                                                                 args.fold_num)
-    T3_SH_path_save_info = f'results/Multi_atlas/{args.Multi_atlas[0]}_{args.Multi_atlas[1]}/model{args.timestamp}' + os.path.sep + "train_T3_sh_info{}_{}.csv".format(args.timestamp,
+    T3_path_save_info = f'results/Multi_atlas/{args.Multi_atlas[0]}_{args.Multi_atlas[1]}/model{args.timestamp}' + os.path.sep + "train_T3_info{}_{}.csv".format(args.timestamp,
                                                                                                 args.fold_num)
     if args.num_atlas==2:
-        path_save_info_list = [path_save_info, T1_SH_path_save_info, T2_SH_path_save_info]
+        path_save_info_list = [path_save_info, T1_path_save_info, T2_path_save_info]
     elif args.num_atlas==3:
-        path_save_info_list = [path_save_info, T1_SH_path_save_info, T2_SH_path_save_info, T3_SH_path_save_info]
+        path_save_info_list = [path_save_info, T1_path_save_info, T2_path_save_info, T3_path_save_info]
 
     # total results
     with open(path_save_info, "w") as f:
@@ -72,20 +72,20 @@ def main(args, i):
     with open(path_save_info.replace(".csv", "_test.csv"), "w") as f:
         f.write("tot_loss,acc,sen,spec,f1\n")
 
-    with open(T1_SH_path_save_info, "w") as f:
+    with open(T1_path_save_info, "w") as f:
         f.write("loss,acc,sen,spec,f1\n")
-    with open(T1_SH_path_save_info.replace(".csv", "_test.csv"), "w") as f:
+    with open(T1_path_save_info.replace(".csv", "_test.csv"), "w") as f:
         f.write("loss,acc,sen,spec,f1\n")
 
-    with open(T2_SH_path_save_info, "w") as f:
+    with open(T2_path_save_info, "w") as f:
         f.write("loss,acc,sen,spec,f1\n")
-    with open(T2_SH_path_save_info.replace(".csv", "_test.csv"), "w") as f:
+    with open(T2_path_save_info.replace(".csv", "_test.csv"), "w") as f:
         f.write("loss,acc,sen,spec,f1\n")
 
     if args.num_atlas==3:
-        with open(T3_SH_path_save_info, "w") as f:
+        with open(T3_path_save_info, "w") as f:
             f.write("loss,acc,sen,spec,f1\n")
-        with open(T3_SH_path_save_info.replace(".csv", "_test.csv"), "w") as f:
+        with open(T3_path_save_info.replace(".csv", "_test.csv"), "w") as f:
             f.write("loss,acc,sen,spec,f1\n")
 
     for epoch in range(1, args.num_epoch + 1):
@@ -168,7 +168,7 @@ def cross(args):
 
     for fold in range(1, 6):
         t1_result_csv = pd.read_csv(
-            f'results/Multi_atlas/{args.Multi_atlas[0]}_{args.Multi_atlas[1]}/model{args.timestamp}/train_T1_sh_info{args.timestamp}_{fold}_test.csv')
+            f'results/Multi_atlas/{args.Multi_atlas[0]}_{args.Multi_atlas[1]}/model{args.timestamp}/train_T1_info{args.timestamp}_{fold}_test.csv')
         t1_test_result = t1_result_csv.iloc[-1]
 
         with open(
@@ -203,7 +203,7 @@ def cross(args):
 
     for fold in range(1, 6):
         t2_result_csv = pd.read_csv(
-            f'results/Multi_atlas/{args.Multi_atlas[0]}_{args.Multi_atlas[1]}/model{args.timestamp}/train_T2_sh_info{args.timestamp}_{fold}_test.csv')
+            f'results/Multi_atlas/{args.Multi_atlas[0]}_{args.Multi_atlas[1]}/model{args.timestamp}/train_T2_info{args.timestamp}_{fold}_test.csv')
         t2_test_result = t2_result_csv.iloc[-1]
 
         with open(
@@ -238,7 +238,7 @@ def cross(args):
     if args.num_atlas == 3:
         for fold in range(1, 6):
             t3_result_csv = pd.read_csv(
-                f'results/Multi_atlas/{args.Multi_atlas[0]}_{args.Multi_atlas[1]}/model{args.timestamp}/train_T3_sh_info{args.timestamp}_{fold}_test.csv')
+                f'results/Multi_atlas/{args.Multi_atlas[0]}_{args.Multi_atlas[1]}/model{args.timestamp}/train_T3_info{args.timestamp}_{fold}_test.csv')
             t3_test_result = t3_result_csv.iloc[-1]
 
             with open(
