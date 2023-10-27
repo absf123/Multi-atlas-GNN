@@ -7,11 +7,11 @@ import re
 class Config():
     def __init__(self):
         super().__init__()
-        parser = argparse.ArgumentParser(description='Argparse Multi-atlas project')
+        parser = argparse.ArgumentParser(description='Argparse single GCN')
         timestamp = datetime.today().strftime("%Y%m%d%H%M%S")
 
         # pytorch base
-        parser.add_argument("--cuda_num", default=0, type=str, help="0~5")
+        parser.add_argument("--cuda_num", default=1, type=str, help="0~5")
         parser.add_argument("--device")
 
         # training hyperparams
@@ -26,13 +26,13 @@ class Config():
         parser.add_argument("--momentum", default=0.9, type=float, help="optimizer momentum - SGD, MADGRAD")
         parser.add_argument("--gamma", default=0.995, type=float, help="gamma for lr learning")
         parser.add_argument("--info_gain_weight", default=[0.522, 0.478], type=list, help="info gain weight")
-        parser.add_argument("--p_value", default=0.01, type=float, help="AAL Harvard AALHarvard")
+        parser.add_argument("--p_value", default=0.05, type=float, help="AAL Harvard AALHarvard")
         parser.add_argument("--edge_binary", default=True, type=bool, help="0, 1")
         parser.add_argument("--edge_abs", default=True, type=bool, help="-,+ -> +")
-        parser.add_argument("--Multi_p_value", default=[0.01, 0.01, 0.01], type=list, help="AAL Harvard AALHarvard")
+        parser.add_argument("--Multi_p_value", default=[0.05, 0.05, 0.05], type=list, help="AAL Harvard AALHarvard")
         parser.add_argument("--cheb_k", default=2, type=int, help="ChebGCN k for combine GCN")
         parser.add_argument("--Holistic_atlas", default="AH",
-                            type=str, help="atlas AH 228 AC 316 HC 312")
+                            type=str, help="atlas AH 228 AC 316 AP 380 HC 312 HP 376 CP 464 ")
         parser.add_argument("--Multi_atlas", default=["AAL", "Harvard"], type=list, help="T1, T2, T3")
         parser.add_argument("--Single_atlas", default="AAL", type=str, help="T1, T2, T3")
         parser.add_argument("--num_atlas", default=2, type=int, help="2, 3")
@@ -40,9 +40,6 @@ class Config():
         parser.add_argument("--dropout_ratio", default=0.0, type=float, help="fc layer dropout")
 
         parser.add_argument("--embCh", default=16, type=int, help="")
-        parser.add_argument("--T2_Ch", default=16, type=int, help="")
-        parser.add_argument("--T3_Ch", default=16, type=int, help="")
-        parser.add_argument("--Hol_Ch", default=16, type=int, help="")
 
         parser.add_argument("--Hol_numROI", default=228, type=int,
                             help="AH : 228, AC : 316, HC : 312"
@@ -51,7 +48,6 @@ class Config():
                             help="Multi atlas nodes")
         parser.add_argument("--Single_numROI", default=116, type=list,
                             help="single atlas nodes")
-        parser.add_argument("--mmtm_ratio", default=4, type=int, help="MMTM hidden layer unit ratio")
         # source file
         parser.add_argument('--fold_num', default=1, type=int, help='num of fold txt')
 
@@ -64,8 +60,6 @@ class Config():
         self.args = parser.parse_args()
         self.cuda_num = self.args.cuda_num
         self.device = torch.device("cuda:{}".format(self.cuda_num) if torch.cuda.is_available() else "cpu")
-        self.mode = self.args.mode
-        self.remark = self.args.remark
 
         self.seed = self.args.seed
         self.lr = self.args.lr
