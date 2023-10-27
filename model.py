@@ -9,34 +9,6 @@ from torch_geometric.nn.dense import DenseGCNConv
 import torch
 import torch.nn.functional as F
 
-class Single_GCN(nn.Module):
-    def __init__(self, args, numROI, init_ch, channel, bias=True):
-        super(Single_GCN, self).__init__()
-        self.args = args
-        self.numROI = numROI
-        self.channel = channel
-        self.gnn1 = DenseGCNConv(in_channels=init_ch, out_channels=channel[1], bias=bias)
-        self.gnn2 = DenseGCNConv(in_channels=channel[1], out_channels=channel[2], bias=bias)
-        self.mish = nn.Mish()
-
-        self.fc1 = nn.Linear(self.numROI * channel[2], self.numROI * channel[2]//8)
-        self.bn1 = nn.BatchNorm1d(num_features=self.numROI * channel[2]//8)
-        self.fc2 = nn.Linear(self.numROI * channel[2]//8, 2)
-        self.dropout = nn.Dropout(p=args.dropout_ratio)
-
-    def forward(self, x, A):
-        out = self.mish(self.gnn1(x=x, adj=A))
-        x1 = out.clone()
-
-        out = self.mish(self.gnn2(x=out, adj=A))
-        x2 = out.clone()
-
-        x = out.reshape(-1, self.numROI * self.channel[-1])
-        out_features = F.dropout(F.mish(self.bn1(self.fc1(x))), p=0.0)
-        logits = self.fc2(out_features)
-
-        return x1, x2, out_features, logits
-
 class Single_GNN(nn.Module):
     def __init__(self, args, numROI, init_ch, channel, K=2, bias=True):
         super(Single_GNN, self).__init__()
