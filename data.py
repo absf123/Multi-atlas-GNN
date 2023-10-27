@@ -66,7 +66,7 @@ def get_FC_map(txt=None, nan_fc_subject_list=None, atlas="AAL", fold_num=1):
     return [data, label, train_weight_index, topology]
 
 
-def single_atlas_DataLoader(args, single_atlas):
+def atlas_DataLoader(args, atlas):
     txt_train_dir = f'Data_txt_list/MDD_train_data_list_' + str(args.fold_num) + '.txt'
     txt_test_dir = f'Data_txt_list/MDD_test_data_list_' + str(args.fold_num) + '.txt'
     # zero roi subject
@@ -76,8 +76,8 @@ def single_atlas_DataLoader(args, single_atlas):
 
     txt_train = pd.read_csv(txt_train_dir, names=['Subject ID'])
     txt_test = pd.read_csv(txt_test_dir, names=['Subject ID'])
-    [train_data, train_label, train_weight_index, topology] = get_FC_map(txt=txt_train, nan_fc_subject_list=nan_fc_subject_list, atlas=single_atlas, fold_num=args.fold_num)
-    [test_data, test_label, _, _] = get_FC_map(txt=txt_test, atlas=single_atlas, fold_num=args.fold_num)
+    [train_data, train_label, train_weight_index, topology] = get_FC_map(txt=txt_train, nan_fc_subject_list=nan_fc_subject_list, atlas=atlas, fold_num=args.fold_num)
+    [test_data, test_label, _, _] = get_FC_map(txt=txt_test, atlas=atlas, fold_num=args.fold_num)
 
     train_static_edge, \
     test_static_edge = define_node_edge(train_data=train_data, test_data=test_data, t=topology, p_value=args.p_value, edge_binary=args.edge_binary, edge_abs=args.edge_abs)
@@ -91,8 +91,8 @@ def single_atlas_DataLoader(args, single_atlas):
     test_label = torch.LongTensor(test_label).to(args.device)
 
     # dataloader
-    train_dataset = custom_single_dataset(train_Node_list, train_A_list, train_label)
-    test_dataset = custom_single_dataset(test_Node_list, test_A_list, test_label)
+    train_dataset = custom_dataset(train_Node_list, train_A_list, train_label)
+    test_dataset = custom_dataset(test_Node_list, test_A_list, test_label)
 
     set_seed(args.seed)
     if args.batch_size > len(train_dataset):
@@ -109,10 +109,10 @@ def single_atlas_DataLoader(args, single_atlas):
     return train_loader, test_loader, weight
 
 
-class custom_single_dataset(torch.utils.data.Dataset):
+class custom_dataset(torch.utils.data.Dataset):
     # for single atlas
     def __init__(self, node_tensor, edge_tensor, label_tensor):
-        super(custom_single_dataset, self).__init__()
+        super(custom_dataset, self).__init__()
         self.node = node_tensor
         self.edge = edge_tensor
         self.label = label_tensor
