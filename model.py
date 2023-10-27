@@ -9,9 +9,9 @@ from torch_geometric.nn.dense import DenseGCNConv
 import torch
 import torch.nn.functional as F
 
-class Single_GNN(nn.Module):
+class GNN(nn.Module):
     def __init__(self, args, numROI, init_ch, channel, K=2, bias=True):
-        super(Single_GNN, self).__init__()
+        super(GNN, self).__init__()
         self.args = args
         self.numROI = numROI
         self.channel = channel
