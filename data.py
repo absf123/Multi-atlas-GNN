@@ -30,14 +30,14 @@ def get_subject_id(file_name):
     return symptom, subject_ID, mat_full_name  # MDD, S1-1-0001, ROISignals_S1-1-0001.mat
 
 
-def get_FC_map(txt=None, nan_fc_subject_list=None, atlas="AAL", fold_num=1):
+def get_FC_map(txt, nan_fc_subject_list, atlas="AAL", fold_num=1):
     data_load_path = f"Data/{atlas}/MDD_{atlas}_FC"
 
     data = []
     label = []
     train_weight_index = [0, 0]
 
-    topology = f"Topology/{atlas}/t_test_{atlas}_fold_{fold_num}.npy"
+    topology = np.load(f"Topology/{atlas}/t_test_{atlas}_fold_{fold_num}.npy")
 
     new_sub_list = []
     if len(nan_fc_subject_list) != 0:
@@ -77,7 +77,7 @@ def atlas_DataLoader(args, atlas):
     txt_train = pd.read_csv(txt_train_dir, names=['Subject ID'])
     txt_test = pd.read_csv(txt_test_dir, names=['Subject ID'])
     [train_data, train_label, train_weight_index, topology] = get_FC_map(txt=txt_train, nan_fc_subject_list=nan_fc_subject_list, atlas=atlas, fold_num=args.fold_num)
-    [test_data, test_label, _, _] = get_FC_map(txt=txt_test, atlas=atlas, fold_num=args.fold_num)
+    [test_data, test_label, _, _] = get_FC_map(txt=txt_test, atlas=atlas, nan_fc_subject_list=nan_fc_subject_list, fold_num=args.fold_num)
 
     train_static_edge, \
     test_static_edge = define_node_edge(train_data=train_data, test_data=test_data, t=topology, p_value=args.p_value, edge_binary=args.edge_binary, edge_abs=args.edge_abs)
