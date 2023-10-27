@@ -76,13 +76,13 @@ def cross(args):
     print("validation id : [{}]".format(args.model_save_timestamp))
 
 
-    print(f"model timestamp: {args.timestamp} | atlas: {args.Early_atlas}")
+    print(f"model timestamp: {args.timestamp} | atlas: {args.Holistic_atlas}")
     print("="*10+"fold results"+"="*10)
     for fold in range(1, 6):
         result_csv = pd.read_csv(
-            f'results/Early/{args.Early_atlas}/model{args.timestamp}/train_info{args.timestamp}_{fold}_test.csv')
+            f'results/Early/{args.Holistic_atlas}/model{args.timestamp}/train_info{args.timestamp}_{fold}_test.csv')
         test_result = result_csv.iloc[-1]
-        with open(f'results/Early/{args.Early_atlas}/model{args.timestamp}/cross_val_result{args.timestamp}.csv', 'a') as f:
+        with open(f'results/Early/{args.Holistic_atlas}/model{args.timestamp}/cross_val_result{args.timestamp}.csv', 'a') as f:
             f.write('{},{},{},{},{}\n'.format(fold, round(test_result[1], 5) * 100, round(test_result[2], 5) * 100,
                                               round(test_result[3], 5) * 100, round(test_result[4], 5) * 100 ))
             total_result[0][fold - 1] = test_result[1]
@@ -95,7 +95,7 @@ def cross(args):
                                                           round(test_result[2], 5),
                                                           round(test_result[3], 5),
                                                           round(test_result[4], 5)))
-    with open(f'results/Early/{args.Early_atlas}/model{args.timestamp}/cross_val_result{args.timestamp}.csv', 'a') as f:
+    with open(f'results/Early/{args.Holistic_atlas}/model{args.timestamp}/cross_val_result{args.timestamp}.csv', 'a') as f:
         f.write('avg,{:.2f},{:.2f},{:.2f},{:.2f}\n'.format(np.mean(total_result[0]) * 100, np.mean(total_result[1]) * 100,
                                                     np.mean(total_result[2]) * 100,np.mean(total_result[3]) * 100))
         f.write('std,{:.2f},{:.2f},{:.2f},{:.2f}'.format(np.nanstd(total_result[0], ddof=1) * 100, np.nanstd(total_result[1], ddof=1) * 100,
