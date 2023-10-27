@@ -21,11 +21,11 @@ def main(args, i):
     print("fold :{} device {}".format(args.fold_num, args.device))
     set_seed(args.seed)
 
-    train_loader, test_loader, weight = atlas_DataLoader(args=args, atlas=args.Early_atlas)
+    train_loader, test_loader, weight = atlas_DataLoader(args=args, atlas=args.Holistic_atlas)
 
     set_seed(args.seed)
     ## ChebNet
-    model = GNN(args=args, numROI=args.Early_numROI, init_ch=args.Early_numROI, channel=args.Early_embCh, K=args.cheb_k).to(args.device)
+    model = GNN(args=args, numROI=args.Hol_numROI, init_ch=args.Hol_numROI, channel=args.Hol_embCh, K=args.cheb_k).to(args.device)
 
     # optimizer
     optimizer_model = selecting_optim(args=args, model=model, lr=args.lr)
@@ -35,9 +35,9 @@ def main(args, i):
     loss_ce = nn.CrossEntropyLoss(weight=weight)
 
     # save log
-    if not (os.path.isdir(f'results/Early/{args.Early_atlas}/model{args.timestamp}')):
-        os.makedirs(os.path.join(f'results/Early/{args.Early_atlas}/model{args.timestamp}'))
-    path_save_info = f'results/Early/{args.Early_atlas}/model{args.timestamp}' + os.path.sep + f"train_info{args.timestamp}_{args.fold_num}.csv"
+    if not (os.path.isdir(f'results/Early/{args.Holistic_atlas}/model{args.timestamp}')):
+        os.makedirs(os.path.join(f'results/Early/{args.Holistic_atlas}/model{args.timestamp}'))
+    path_save_info = f'results/Early/{args.Holistic_atlas}/model{args.timestamp}' + os.path.sep + f"train_info{args.timestamp}_{args.fold_num}.csv"
 
     path_save_info_list = [path_save_info]
     # total results
