@@ -10,7 +10,7 @@ from utils import selecting_optim
 from data import single_atlas_DataLoader
 from model import Single_GNN
 from Config import Config
-from train_eval_test import train, test
+from train import train, test
 from seed import set_seed
 
 
