@@ -4,8 +4,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from graph_utils import laplacian_norm_adj, add_self_loop_cheb
 
-from torch_geometric.nn.dense import DenseGCNConv
-
 import torch
 import torch.nn.functional as F
 
