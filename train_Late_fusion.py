@@ -167,7 +167,7 @@ def test_two(model_list, test_loader, loss_ce, epoch, path_save_info_list):
                          sensitivity(test_T2_out_stack, test_T2_label_stack),
                          specificity(test_T2_out_stack, test_T2_label_stack),
                          T2_f1))
-        # testation checkpoint : 아직 구현x
+            
         with open(path_save_info.replace(".csv", "_test.csv"), "a") as f:
             f.write(
                 "{:},{:},{:},{:},{:},{:}\n".format(epoch, test_epoch_cost / len(test_loader),
@@ -278,7 +278,7 @@ def train_three(model_list, train_loader, optimizer_list, loss_ce, epoch, path_s
                      specificity(train_T3_out_stack, train_T3_label_stack),
                      T3_f1))
 
-        # training checkpoint
+    # training checkpoint
     with open(path_save_info.replace(".csv", "_train.csv"), "a") as f:
         f.write(
             "{:},{:},{:},{:},{:},{:}\n".format(epoch, train_epoch_cost / len(train_loader),
