@@ -107,7 +107,7 @@ def main(args, i):
 
             # test
             if epoch % args.test_epoch_checkpoint == 0:
-                test_two(model_list, test_loader, loss_ce, epoch, args, path_save_info_list)
+                test_two(model_list, test_loader, loss_ce, epoch, path_save_info_list)
         elif args.num_atlas == 3:
             # train
             train_three(model_list, train_loader, optimizer_list, loss_ce, epoch, path_save_info_list)
