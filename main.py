@@ -25,7 +25,7 @@ def main(args, i):
 
     set_seed(args.seed)
     ## ChebNet
-    model = GNN(args=args, numROI=args.numROI, init_ch=args.numROI, channel=args.embCh, K=args.cheb_k).to(args.device)
+    model = GNN(args=args, numROI=args.Single_numROI, init_ch=args.Single_numROI, channel=args.Single_embCh, K=args.cheb_k).to(args.device)
 
     # optimizer
     optimizer_model = selecting_optim(args=args, model=model, lr=args.lr)
