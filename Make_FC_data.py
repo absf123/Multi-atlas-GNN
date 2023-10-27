@@ -21,7 +21,7 @@ def make_fc_map(f_names, atlas="AAL"):
     for f_name in f_names:
         mat_file = io.loadmat('Data/ROISignals_FunImgARCWF/{}'.format(f_name))
         mat = mat_file['ROISignals']  # signal, node
-        # single
+        # Single
         if atlas == "AAL":
             mat = mat[:, :116]   # AAL 116 ROI
         elif atlas == "Harvard":
@@ -29,7 +29,7 @@ def make_fc_map(f_names, atlas="AAL"):
         elif atlas == "Craddock":
             mat = mat[:, 228:428]   # 200 ROI
 
-        # Holistic atlas: early fusion
+        # Holistic atlas: Early fusion
         elif atlas == "AH":  # AAL, Harvard 228
             mat = mat[:, :228]
         elif atlas == "AC":  # AAL, Craddock 316
