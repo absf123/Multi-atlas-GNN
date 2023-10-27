@@ -50,7 +50,7 @@ def add_self_loop_cheb(adj, fill_value: float = 1.):
     return adj
 
 # p value masking
-def pValueMasking(feature, t_test, p_value, binary=False, abs=True):
+def pValueMasking(feature, t_test, p_value, binary=True, abs=True):
     data = feature.copy()  # numpy copy
     mask = t_test <= p_value
     if abs:
