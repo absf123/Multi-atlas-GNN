@@ -338,6 +338,4 @@ class custom_multi_dataset_Three(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.T1_x)
 
-    def __len__(self):
-        return len(self.T1_x)
 
