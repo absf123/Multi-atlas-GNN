@@ -6,7 +6,7 @@ from data import get_subject_id
 from scipy import io
 import os, sys
 
-def get_FC_map(txt=None, nan_fc_subject_list=None, atlas="Harvard", fold_num=1):
+def get_FC_map(txt=None, nan_fc_subject_list=None, atlas="Harvard"):
     data_load_path = f"Data/{atlas}/MDD_{atlas}_FC"
 
     data = []
@@ -61,7 +61,7 @@ def t_test_topology(ROI=112, atlas="AAL"):
         txt_train_dir = f'Data_txt_list/MDD_train_data_list_fold_' + str(fold) + '.txt'
 
         txt_train = pd.read_csv(txt_train_dir, names=['Subject ID'])
-        [train_data, train_label, _] = get_FC_map(txt=txt_train, nan_fc_subject_list=nan_fc_subject_list, fold_num=fold)
+        [train_data, train_label, _] = get_FC_map(txt=txt_train, nan_fc_subject_list=nan_fc_subject_list)
         flatten = flatten_fc(train_data)
         MDDflatten = flatten[train_label == 1]
         NCflatten = flatten[train_label == 0]
