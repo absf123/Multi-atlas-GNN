@@ -6,8 +6,8 @@ from data import get_subject_id
 from scipy import io
 import os, sys
 
-def get_FC_map(txt=None, nan_fc_subject_list=None, atlas="Harvard"):
-    data_load_path = f"Data/{atlas}/MDD_{atlas}_FC"
+def get_FC_map(txt=None, nan_fc_subject_list=None, atlas="AAL"):
+    data_load_path = f"Data/{atlas}/MDD_{atlas}_FC"  # FC data
 
     data = []
     label = []
@@ -20,8 +20,7 @@ def get_FC_map(txt=None, nan_fc_subject_list=None, atlas="Harvard"):
                 new_sub_list.append(sub_name)
     else:
         for sub_name in txt["Subject ID"]:
-            if sub_name in nan_fc_subject_list:
-                new_sub_list.append(sub_name)
+            new_sub_list.append(sub_name)
 
     for file_name in new_sub_list:
         symptom, subject_ID, mat_full_name = get_subject_id(file_name)  # MDD_Data, S1-1-0001, ROISignals_S1-1-0001.mat
@@ -53,22 +52,24 @@ def flatten2dense(flatten, ROI):
     sym = sym + sym.T
     return sym
 
-def t_test_topology(ROI=112, atlas="AAL"):
+def t_test_topology(ROI=116, atlas="AAL"):
     nan_fc_subject_list = ['ROISignals_S20-1-0028.mat', 'ROISignals_S20-1-0038.mat', 'ROISignals_S20-1-0061.mat',
                            'ROISignals_S20-1-0094.mat', 'ROISignals_S20-1-0251.mat', 'ROISignals_S20-2-0038.mat',
                            'ROISignals_S20-2-0045.mat', 'ROISignals_S20-2-0063.mat', 'ROISignals_S20-2-0095.mat']
     for fold in range(1, 6):
-        txt_train_dir = f'Data_txt_list/MDD_train_data_list_fold_' + str(fold) + '.txt'
+        txt_train_dir = f'Data_txt_list/MDD_train_data_list_' + str(fold) + '.txt'
 
         txt_train = pd.read_csv(txt_train_dir, names=['Subject ID'])
-        [train_data, train_label, _] = get_FC_map(txt=txt_train, nan_fc_subject_list=nan_fc_subject_list)
+        [train_data, train_label, _] = get_FC_map(txt=txt_train, nan_fc_subject_list=nan_fc_subject_list, atlas=atlas)
         flatten = flatten_fc(train_data)
         MDDflatten = flatten[train_label == 1]
         NCflatten = flatten[train_label == 0]
         p_value = stats.ttest_ind(MDDflatten, NCflatten, equal_var=False).pvalue
         p_value = flatten2dense(p_value, ROI)
-
-        np.save(f"Topology/{atlas}/ttest_pvalue/t_test_{atlas}_fold_{fold}.npy", p_value)
+        t_test_save_dir = f'Topology/{atlas}'
+        if not (os.path.isdir(t_test_save_dir)):
+            os.makedirs(t_test_save_dir)
+        np.save(f"Topology/{atlas}/t_test_{atlas}_fold_{fold}.npy", p_value)
         print(f"atlas:{atlas} pvalue shape:{p_value.shape}")
 
 if __name__ == "__main__":
