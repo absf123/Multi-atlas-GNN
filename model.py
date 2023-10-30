@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from graph_utils import laplacian_norm_adj, add_self_loop_cheb
 
+
 import torch
 import torch.nn.functional as F
 
@@ -35,11 +36,6 @@ class GNN(nn.Module):
         return x1, x, out_features, logits
 
 class myChebConv(torch.nn.Module):
-    """
-    simple GCN layer
-    Z = f(X, A) = softmax(A` * ReLU(A` * X * W0)* W1)
-    A` = D'^(-0.5) * A * D'^(-0.5)
-    """
     def __init__(self, in_features, out_features, K=4, bias=True):
         # input
         super(myChebConv, self).__init__()
@@ -52,20 +48,18 @@ class myChebConv(torch.nn.Module):
             self.register_parameter('bias', None)
         self.reset_parameters()
     def reset_parameters(self):
-        # BN operations
         stdv = 1. / math.sqrt(self.weight.shape[1])
         self.weight.data.uniform_(-stdv, stdv)
         if self.bias is not None:
             nn.init.constant_(self.bias, 0)
     def forward(self, x, adj):
-        # A` * X * W
         x = x.unsqueeze(0) if x.dim() == 2 else x
 
         adj = adj.clone()
-        adj = laplacian_norm_adj(adj)  # DAD^T
+        adj = laplacian_norm_adj(adj)  
         adj = add_self_loop_cheb(-adj)
         Tx_0 = x
-        Tx_1 = x  # Dummy.
+        Tx_1 = x
         out = torch.matmul(Tx_0, self.weight[0])
         # propagate_type: (x: Tensor, norm: Tensor)
         if self.weight.shape[0] > 1:
